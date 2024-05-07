@@ -1,0 +1,9 @@
+main: cn.cyanbukkit.bukkit.addon.PlayMorph
+name: SiModule-Morph
+version: 1.0
+authors:
+  - Cyanbukkit Union
+website: https://www.cyanbukkit.net
+depend:
+  - SiModuleGame
+prefix: §bBukkitGame§7
