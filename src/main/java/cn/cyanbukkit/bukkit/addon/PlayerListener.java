@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 
 public class PlayerListener implements Listener {
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerDeathEvent e) {
         Player p = e.getEntity();
         net.minecraft.entity.player.EntityPlayer entityPlayer = null;

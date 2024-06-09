@@ -20,8 +20,8 @@ public class PlayMorph extends JavaPlugin {
 
 
     public static PlayMorph instance;
-    public boolean isShow = false;
-    public List<MorphData> list = new ArrayList<>();
+//    public boolean isShow = false;
+//    public List<MorphData> list = new ArrayList<>();
 
     /**
      * Merge given args from given index
@@ -73,17 +73,21 @@ public class PlayMorph extends JavaPlugin {
             return;
         }
         MorphData morphData = new MorphData(morph, p, (int) ((getLength(morph) / 20.0) * 1000L));
-        if (isShow) {
-            list.add(morphData);
-        } else {
-            Bukkit.getConsoleSender().sendMessage("§c§l[变身]§r§c 开始播放变身模型: " + morphData.getMorph().name + " 时长: " + getLength(morph) + "s");
-            play(morphData);
+        net.minecraft.entity.player.EntityPlayer entityPlayer = null;
+        try {
+            Method getHandle = p.getClass().getMethod("getHandle");
+            entityPlayer = (net.minecraft.entity.player.EntityPlayer) getHandle.invoke(p);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+        mchorse.metamorph.api.MorphAPI.demorph(entityPlayer);
+        Bukkit.getConsoleSender().sendMessage("§c§l[变身]§r§c 开始播放变身模型: " + morphData.getMorph().name + " 时长: " + getLength(morph) + "s");
+        play(morphData);
     }
 
 
     public void play(MorphData thisMorphData) {
-        isShow = true;// Reflection to cast craftPlayer
+//        isShow = true;// Reflection to cast craftPlayer
         net.minecraft.entity.player.EntityPlayer entityPlayer = null;
         try {
             Method getHandle = thisMorphData.getPlayer().getClass().getMethod("getHandle");
@@ -95,26 +99,19 @@ public class PlayMorph extends JavaPlugin {
         if (MorphAPI.demorph(entityPlayer)) {
             mchorse.metamorph.api.MorphAPI.morph(entityPlayer, thisMorphData.getMorph(), true);
         }
+
         // 调用 getHandle 方法获取 EntityPlayer 对象
         // Asynchronously find and play from the list
         net.minecraft.entity.player.EntityPlayer finalEntityPlayer = entityPlayer;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!PlayMorph.instance.list.isEmpty()) {
-                    play(PlayMorph.instance.list.get(0)); // Play the next one
-                    PlayMorph.instance.list.remove(0);
-                } else {
-                    isShow = false;
-                    // Close the morph
-                    try {
-                        mchorse.metamorph.api.MorphAPI.demorph(finalEntityPlayer);
-                        Bukkit.getConsoleSender().sendMessage("§c§l[变身]§r§c 关闭变身模型: " + thisMorphData.getMorph().name);
-                    } catch (Exception e) {
-                        Bukkit.getConsoleSender().sendMessage("§c§l[变身]§r§c 未找到变身模型: " + thisMorphData.getMorph().name);
-                        e.printStackTrace();
-                        return;
-                    }
+                try {
+                    mchorse.metamorph.api.MorphAPI.demorph(finalEntityPlayer);
+                    Bukkit.getConsoleSender().sendMessage("§c§l[变身]§r§c 关闭变身模型: " + thisMorphData.getMorph().name);
+                } catch (Exception e) {
+                    Bukkit.getConsoleSender().sendMessage("§c§l[变身]§r§c 未找到变身模型: " + thisMorphData.getMorph().name);
+                    e.printStackTrace();
                 }
                 cancel();
             }
