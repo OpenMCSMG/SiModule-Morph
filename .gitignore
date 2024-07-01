@@ -1,3 +1,4 @@
 /.gradle/
 /.idea/
-/grades/wrapper/dists/
+
+gradle.properties

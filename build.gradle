@@ -1,3 +1,5 @@
+import javax.net.ssl.HttpsURLConnection
+
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
@@ -98,8 +100,16 @@ jar {
         ])
     }
 }
+
+build {
+    doLast {
+        println("Build success")
+        uploadJar()
+    }
+}
+
 // UTF-8
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
 }
 // Example configuration to allow publishing using the maven-publish task
@@ -112,6 +122,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+
         }
     }
     repositories {
@@ -120,3 +131,52 @@ publishing {
         }
     }
 }
+
+
+def uploadJar() {
+    def s = "https://api.cyanbukkit.cn/v1/live/game/upload?name=${archivesBaseName}&version=${version}"
+    def url = new URL(s).openConnection()
+    url = url as HttpsURLConnection
+    url.setRequestProperty("Content-Type", "application/java-archive")
+    url.setRequestProperty("x-token", project.properties['token'] as String)
+    println("Start upload")
+    url.requestMethod = "PUT"
+    url.doOutput = true
+    try {
+        url.outputStream.withStream { output ->
+            shadowJarFile.inputStream().withStream { input ->
+                input.transferTo(output)
+            }
+        }
+    } catch (Exception e) {
+        println("Error during file transfer: ${e.message}")
+    }
+    println("Uploading")
+    if (url.responseCode != 200) {
+        throw new IOException(url.content.text)
+    } else {
+        println("Upload success")
+    }
+}
+//
+//tasks.register('uploadJar', Copy) {
+//
+//    doLast {
+//        // 获取构建目录和项目名称
+//        def buildDir = project.buildDir
+//        def projectDir = project.rootDir
+//        def projectName = project.name
+//        def version = project.version
+//
+//        // 构建 JAR 文件的路径
+//        def shadowJarFile = new File("$buildDir/libs/${projectName}-${version}.jar")
+//
+//        // 定义上传函数
+//        def uploadTo = {  ->
+//
+//        }
+//
+//        // 执行上传函数
+//        uploadTo()
+//    }
+//}
