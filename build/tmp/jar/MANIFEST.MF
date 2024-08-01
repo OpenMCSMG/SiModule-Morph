@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Specification-Title: simodule-morph
+Specification-Vendor: simodule-morph
+Specification-Version: 1.1
+Implementation-Title: SiModule-Morph
+Implementation-Version: 1.1
+Implementation-Vendor: morphaddon
+Implementation-Timestamp: 2024-07-01T19:48:06+0800
+
